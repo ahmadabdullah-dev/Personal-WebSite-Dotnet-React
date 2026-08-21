@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   Drawer,
   Box,
@@ -11,7 +10,10 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
-import { useState } from "react";
+import { useState, Fragment } from "react";
+import { useNavigate } from "react-router";
+import Footer from "./Footer";
+import theme from "../lib/theme";
 
 export interface DrawerNavItem {
   label: string;
@@ -26,6 +28,7 @@ export interface DrawerProps {
 export default function TemporaryDrawer({ items }: DrawerProps) {
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const navigate = useNavigate();
   const toggleDrawer = (next: boolean) => () => setOpen(next);
 
   return (
@@ -37,7 +40,7 @@ export default function TemporaryDrawer({ items }: DrawerProps) {
         sx={{
           color: "text.primary",
           borderRadius: 0,
-          "&:hover": { backgroundColor: "rgba(255,255,255,0.08)" },
+          "&:hover": { backgroundColor: `${theme.palette.background.paper}` },
         }}
       >
         <MenuIcon />
@@ -82,7 +85,7 @@ export default function TemporaryDrawer({ items }: DrawerProps) {
                 letterSpacing: "0.18em",
               }}
             >
-              Ahmad Abdullah
+              Portfolio
             </Typography>
             <IconButton
               onClick={toggleDrawer(false)}
@@ -91,7 +94,9 @@ export default function TemporaryDrawer({ items }: DrawerProps) {
               sx={{
                 color: "text.primary",
                 borderRadius: 0,
-                "&:hover": { backgroundColor: "rgba(255,255,255,0.08)" },
+                "&:hover": {
+                  backgroundColor: `${theme.palette.background.paper}`,
+                },
               }}
             >
               <CloseIcon />
@@ -101,14 +106,15 @@ export default function TemporaryDrawer({ items }: DrawerProps) {
           <Divider />
           <List sx={{ py: 0, flex: 1 }}>
             {items.map((item, i) => (
-              <React.Fragment key={item.label}>
+              <Fragment key={item.label}>
                 <ListItemButton
                   disableRipple
                   onMouseEnter={() => setActiveIndex(i)}
                   onMouseLeave={() => setActiveIndex(null)}
                   onClick={() => {
                     item.onClick?.();
-                    if (item.href) window.location.href = item.href;
+                    if (item.href) navigate(item.href);
+                    setOpen(false);
                   }}
                   sx={(theme) => ({
                     px: 3,
@@ -119,7 +125,7 @@ export default function TemporaryDrawer({ items }: DrawerProps) {
                     ...(activeIndex === i && {
                       borderLeft: `2px solid ${theme.palette.secondary.main}`,
                       pl: 3.75,
-                      backgroundColor: "rgba(255,255,255,0.04)",
+                      backgroundColor: theme.palette.action.hover,
                     }),
                   })}
                 >
@@ -139,10 +145,11 @@ export default function TemporaryDrawer({ items }: DrawerProps) {
                   />
                 </ListItemButton>
                 {i < items.length - 1 && <Divider />}
-              </React.Fragment>
+              </Fragment>
             ))}
           </List>
         </Box>
+        <Footer />
       </Drawer>
     </>
   );
