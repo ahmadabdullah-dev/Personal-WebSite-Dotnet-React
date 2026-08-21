@@ -1,46 +1,36 @@
-﻿using System.Net.Http.Headers;
+﻿using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-
-public class EmailService
+using MimeKit;
+public class EmailService 
 {
     private readonly EmailConfiguration _emailConfig;
     private readonly UserManager<AppUser> _userManager;
     private readonly ILogger<EmailService> _logger;
-    private readonly HttpClient _httpClient;
 
     public EmailService(
         IOptions<EmailConfiguration> emailConfig,
         UserManager<AppUser> userManager,
-        ILogger<EmailService> logger,
-        IHttpClientFactory httpClientFactory)
+        ILogger<EmailService> logger)
     {
         _emailConfig = emailConfig.Value;
         _userManager = userManager;
         _logger = logger;
-        _httpClient = httpClientFactory.CreateClient();
-        _httpClient.BaseAddress = new Uri("https://api.resend.com/");
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _emailConfig.ResendApiKey);
     }
 
     public async Task SendEmailAsync(string to, string subject, string htmlContent)
     {
-        var payload = new
-        {
-            from = _emailConfig.From,
-            to = new[] { to },
-            subject,
-            html = htmlContent
-        };
+        var message = new MimeMessage();
+        message.From.Add(MailboxAddress.Parse(_emailConfig.From));
+        message.To.Add(MailboxAddress.Parse(to));
+        message.Subject = subject;
+        message.Body = new TextPart("html") { Text = htmlContent };
 
-        var response = await _httpClient.PostAsJsonAsync("emails", payload);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            var error = await response.Content.ReadAsStringAsync();
-            _logger.LogError($"Failed to send email to {to}: {response.StatusCode} - {error}");
-            response.EnsureSuccessStatusCode();
-        }
+        using var client = new SmtpClient();
+        await client.ConnectAsync(_emailConfig.SmtpServer, _emailConfig.Port, _emailConfig.EnableSsl);
+        await client.AuthenticateAsync(_emailConfig.UserName, _emailConfig.Password);
+        await client.SendAsync(message);
+        await client.DisconnectAsync(true);
 
         _logger.LogInformation($"Email sent to {to}");
     }
@@ -56,5 +46,7 @@ public class EmailService
         await SendEmailAsync(targetEmail, emailSubject, html);
 
         _logger.LogInformation($"{emailSubject} sent to {targetEmail}");
+
     }
+
 }
