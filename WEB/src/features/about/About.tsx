@@ -38,13 +38,7 @@ export default function About() {
           {about?.description || "No description available."}
         </Typography>
       </Box>
-
-      <Box>
-        <Typography variant="h6" gutterBottom>
-          Skills
-        </Typography>
         <Skills />
-      </Box>
     </Stack>
   );
 }

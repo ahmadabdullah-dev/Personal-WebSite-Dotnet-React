@@ -22,11 +22,11 @@ export default function Skills() {
   const skills = data?.value ?? [];
 
   return (
-    <Paper variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
-      <Typography variant="h6" gutterBottom>
+    <>
+    <Typography variant="h6" gutterBottom>
         Skills
       </Typography>
-
+       <Paper variant="outlined" sx={{ p: 3, borderRadius: 3 }}>
       {skills.length === 0 ? (
         <Typography variant="body2" color="text.secondary">
           No skills found.
@@ -44,5 +44,7 @@ export default function Skills() {
         </Stack>
       )}
     </Paper>
+    </>
+ 
   );
 }
