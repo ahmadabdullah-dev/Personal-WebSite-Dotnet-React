@@ -6,9 +6,10 @@ import {
   Stack,
   Link as MuiLink,
 } from "@mui/material";
-import { Link as RouterLink } from "react-router";
+import { Link as RouterLink, useLocation } from "react-router";
 import TemporaryDrawer from "./TemporaryDrawer";
 import { useEffect, useState } from "react";
+import { useHome } from "../lib/hooks/useHome";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -20,6 +21,8 @@ const NAV_LINKS = [
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
+  const homeData = useHome().readHomeAsync.data?.value;
+  const { pathname } = useLocation();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -27,6 +30,9 @@ export default function Header() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const isActive = (href: string) =>
+    href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
     <AppBar
@@ -51,57 +57,80 @@ export default function Header() {
           alignItems: "center",
         }}
       >
-        <Typography
+        <Box
           component={RouterLink}
           to="/"
           sx={{
-            color: "text.primary",
-            fontWeight: 700,
-            fontSize: { xs: 16, md: 18 },
-            letterSpacing: "0.22em",
+            display: "flex",
+            flexDirection: "column",
+            lineHeight: 1.1,
             textDecoration: "none",
             userSelect: "none",
           }}
         >
-          Portfolio
-        </Typography>
+          <Typography
+            sx={{
+              color: "text.primary",
+              fontWeight: 700,
+              fontSize: { xs: 16, md: 18 },
+              letterSpacing: "0.22em",
+            }}
+          >
+            Portfolio
+          </Typography>
+          {homeData?.fullName && (
+            <Typography
+              sx={{
+                color: "text.secondary",
+                fontSize: { xs: 10, md: 11 },
+                letterSpacing: "0.12em",
+              }}
+            >
+              {homeData.fullName}
+            </Typography>
+          )}
+        </Box>
 
         <Stack
           direction="row"
           spacing={4}
           sx={{ display: { xs: "none", md: "flex" } }}
         >
-          {NAV_LINKS.map((link) => (
-            <MuiLink
-              key={link.label}
-              component={RouterLink}
-              to={link.href}
-              underline="none"
-              sx={{
-                color: "text.primary",
-                fontWeight: 600,
-                fontSize: 12,
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                position: "relative",
-                pb: 0.5,
-                "&:hover": { color: "text.primary" },
-                "&:hover::after": { width: "100%" },
-                "&::after": {
-                  content: '""',
-                  position: "absolute",
-                  left: 0,
-                  bottom: 0,
-                  width: 0,
-                  height: "1px",
-                  backgroundColor: (theme) => theme.palette.secondary.main,
-                  transition: "width 150ms ease",
-                },
-              }}
-            >
-              {link.label}
-            </MuiLink>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const active = isActive(link.href);
+            return (
+              <MuiLink
+                key={link.label}
+                component={RouterLink}
+                to={link.href}
+                underline="none"
+                aria-current={active ? "page" : undefined}
+                sx={{
+                  color: active ? "secondary.main" : "text.primary",
+                  fontWeight: 600,
+                  fontSize: 12,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  position: "relative",
+                  pb: 0.5,
+                  "&:hover": { color: "secondary.main" },
+                  "&:hover::after": { width: "100%" },
+                  "&::after": {
+                    content: '""',
+                    position: "absolute",
+                    left: 0,
+                    bottom: 0,
+                    width: active ? "100%" : 0,
+                    height: "1px",
+                    backgroundColor: (theme) => theme.palette.secondary.main,
+                    transition: "width 150ms ease",
+                  },
+                }}
+              >
+                {link.label}
+              </MuiLink>
+            );
+          })}
         </Stack>
 
         <Box sx={{ display: { xs: "flex", md: "none" }, alignItems: "center" }}>
