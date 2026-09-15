@@ -13,7 +13,7 @@ export const theme = () =>
         contrastText: "#000000",
       },
       secondary: {
-        main: "#005288",
+        main: "#8a8a8a",
       },
       text: {
         primary: "#ffffff",
@@ -25,10 +25,29 @@ export const theme = () =>
     },
     typography: {
       fontFamily: '"Inter", "Helvetica Neue", Helvetica, Arial, sans-serif',
-      h1: { fontWeight: 700, fontSize: "3.5rem", textTransform: "uppercase" },
-      h2: { fontWeight: 700, fontSize: "2.5rem", textTransform: "uppercase" },
-      h3: { fontWeight: 600, fontSize: "1.75rem", textTransform: "uppercase" },
-      button: { textTransform: "uppercase", fontWeight: 600 },
+      h1: {
+        fontWeight: 700,
+        fontSize: "3.5rem",
+        textTransform: "uppercase",
+        letterSpacing: "0.03em",
+      },
+      h2: {
+        fontWeight: 700,
+        fontSize: "2.5rem",
+        textTransform: "uppercase",
+        letterSpacing: "0.03em",
+      },
+      h3: {
+        fontWeight: 600,
+        fontSize: "1.75rem",
+        textTransform: "uppercase",
+        letterSpacing: "0.02em",
+      },
+      button: {
+        textTransform: "uppercase",
+        fontWeight: 600,
+        letterSpacing: "0.02em",
+      },
     },
     shape: {
       borderRadius: 0,
