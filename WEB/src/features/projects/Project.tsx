@@ -15,6 +15,8 @@ import { useProjects } from "../../lib/hooks/useProjects";
 
 export default function Project() {
   const { slug } = useParams<{ slug: string }>();
+  const { getProjectBySlugAsync } = useProjects(undefined, slug);
+  const { data, isLoading, error } = getProjectBySlugAsync;
 
   if (!slug) {
     return (
@@ -25,8 +27,6 @@ export default function Project() {
       </Container>
     );
   }
-  const {getProjectBySlugAsync} = useProjects(undefined, slug);
-  const { data, isLoading, error } = getProjectBySlugAsync;
 
   if (isLoading) {
     return (
